@@ -4,7 +4,6 @@ import { of, pipe } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Member } from '../models/member';
-import { PaginatedResult } from '../models/pagination';
 import { User } from '../models/user';
 import { UserParams } from '../models/userParams';
 import { AccountService } from './account.service';
@@ -91,6 +90,15 @@ export class MembersService {
 
   addLike(username: string) {
     return this.http.post(this.baseUrl + 'likes/' + username, {})
+  }
+
+  removeLike(username: string) {
+    return this.http.delete(this.baseUrl + 'likes/' + username);
+  }
+
+  getLike(username: string) {
+    console.log('here');
+    return this.http.get(this.baseUrl + 'likes/' + username);
   }
 
   getLikes(predicate: string, pageNumber, pageSize) {

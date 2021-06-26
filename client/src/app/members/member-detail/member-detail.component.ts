@@ -10,6 +10,7 @@ import { AccountService } from 'src/app/_services/account.service';
 import { MembersService } from 'src/app/_services/members.service';
 import { MessageService } from 'src/app/_services/message.service';
 import { PresenceService } from 'src/app/_services/presence.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-member-detail',
@@ -19,13 +20,15 @@ import { PresenceService } from 'src/app/_services/presence.service';
 export class MemberDetailComponent implements OnInit, OnDestroy {
   @ViewChild('memberTabs', {static: true}) memberTabs: TabsetComponent;
   member: Member;
+  isUserLiked: boolean;
+  likeButton: string;
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
   activeTab: TabDirective;
   messages: Message[] =[];
   user: User;
 
-  constructor(public presence: PresenceService, private route: ActivatedRoute, 
+  constructor(public presence: PresenceService, private route: ActivatedRoute, private memberService: MembersService, private toastr: ToastrService,
     private messageService: MessageService, private accountService: AccountService, private router: Router) {
       this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
       this.router.routeReuseStrategy.shouldReuseRoute = () => false;
@@ -35,7 +38,9 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     this.route.data.subscribe(data => {
       this.member = data.member;
     })
-
+    
+    this.getLike();
+    
     this.route.queryParams.subscribe(params => {
       params.tab ? this.selectTab(params.tab) : this.selectTab(0);
     })
@@ -72,6 +77,13 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     })
   }
 
+  getLike() {
+    this.memberService.getLike(this.member.username).subscribe(member => {
+      if (member == null){this.isUserLiked = false, this.likeButton = 'Like'} 
+      else {this.isUserLiked = true, this.likeButton = 'Unlike'};
+    })
+  }
+
   selectTab(tabId: number) {
     this.memberTabs.tabs[tabId].active = true;
   }
@@ -89,4 +101,20 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     this.messageService.stopHubConnection();
   }
 
+  addRemoveLike(member: Member){
+    if(this.isUserLiked == false){
+      this.memberService.addLike(member.username).subscribe(() => {
+        this.toastr.success('You have liked ' + member.knownAs);
+      })
+      this.isUserLiked = true;
+      this.likeButton = "Unlike";
+    }
+    else if(this.isUserLiked == true) {
+      this.memberService.removeLike(member.username).subscribe(() => {
+        this.toastr.success('You have unliked ' + member.knownAs);
+      })
+      this.isUserLiked = false;
+      this.likeButton = "Like";
+    } 
+  }
 }

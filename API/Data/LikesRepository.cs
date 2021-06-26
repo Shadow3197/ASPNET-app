@@ -13,9 +13,15 @@ namespace API.Data
   public class LikesRepository : ILikesRepository
   {
     private readonly DataContext _context;
+    
     public LikesRepository(DataContext context)
     {
       _context = context;
+    }
+
+    public void RemoveLike(UserLike userLike)
+    {
+      _context.Likes.Remove(userLike);
     }
 
     public async Task<UserLike> GetUserLike(int sourceUserId, int likeUserId)

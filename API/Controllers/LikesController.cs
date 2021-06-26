@@ -28,23 +28,45 @@ namespace API.Controllers
 
       if (likedUser == null) return NotFound();
 
-      if (sourceUser.UserName == username) return BadRequest("You cannot Like yourself");
+      if (sourceUser.UserName == username) return BadRequest("You cannot like yourself");
 
       var userLike = await _unitOfWork.likesRepository.GetUserLike(sourceUserId, likedUser.Id);
 
-      if (userLike != null) return BadRequest("You already liked this user ");
+      if (userLike != null) {
+        return BadRequest("You already liked this user ");
+      } else {
+          userLike = new UserLike
+        {
+          SourceUserId = sourceUserId,
+          LikeUserId = likedUser.Id
+        };
 
-      userLike = new UserLike
-      {
-        SourceUserId = sourceUserId,
-        LikeUserId = likedUser.Id
-      };
+        sourceUser.LikedUsers.Add(userLike);
 
-      sourceUser.LikedUsers.Add(userLike);
+        if (await _unitOfWork.Complete()) return Ok();
+
+        return BadRequest("Failed to unlike user");
+      }      
+    }
+
+    [HttpDelete("{username}")]
+    public async Task<ActionResult> RemoveLike(string username)
+    {
+      var sourceUserId = User.GetUserId();
+      var likedUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+      var sourceUser = await _unitOfWork.likesRepository.GetUserWithLikes(sourceUserId);
+
+      if (likedUser == null) return NotFound();
+
+      if (sourceUser.UserName == username) return BadRequest("You cannot unlike yourself");
+
+      var userLike = await _unitOfWork.likesRepository.GetUserLike(sourceUserId, likedUser.Id);
+
+      if(userLike != null) _unitOfWork.likesRepository.RemoveLike(userLike);
 
       if (await _unitOfWork.Complete()) return Ok();
 
-      return BadRequest("Failed to like user");
+      return BadRequest("Failed to unlike user");
     }
 
     [HttpGet]
@@ -58,5 +80,18 @@ namespace API.Controllers
       return Ok(users);
     }
 
+    [HttpGet("{username}")]
+    public async Task<ActionResult<UserLike>> GetUserLike(string username)
+    {
+
+      var sourceUserId = User.GetUserId();
+      var likedUser = await _unitOfWork.UserRepository.GetUserByUsernameAsync(username);
+
+      var userLike = await _unitOfWork.likesRepository.GetUserLike(sourceUserId, likedUser.Id);
+      if(userLike != null)
+      {return Ok(userLike.LikeUserId);}
+      else {return Ok(userLike);}
+      
   }
+}
 }

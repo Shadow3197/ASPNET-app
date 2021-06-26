@@ -26,8 +26,10 @@
       </div>
       <div class="card-footer">
         <div class="btn-group">
-          <button class="btn-success">Like</button>
+          <button [ngClass]="{'btn-success' : !isUserLiked, 'btn-warning': isUserLiked}"
+          (click)="addRemoveLike(member)">{{likeButton}}</button>
           <button (click)="selectTab(3)" class="btn-primary">Message</button>
+          <button class="btn-danger">Block</button>
         </div>
       </div>
     </div>
