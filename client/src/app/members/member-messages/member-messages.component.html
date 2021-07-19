@@ -7,6 +7,8 @@
       No messages yet... say hi by using the message box below
     </div>
 
+    
+
     <ul  *ngIf="(messageService.messageThread$ | async)?.length > 0" class="chat">
       <li *ngFor="let message of (messageService.messageThread$ | async)">
         <div>
@@ -31,6 +33,9 @@
         </div>
       </li>
     </ul>
+    <div *ngIf="userHasBlocked === true">
+      You have been blocked or have blocked this user.
+    </div>
   </div>
   
   <div class="card-footer">
@@ -44,7 +49,7 @@
         class="form-control input-sm" 
         placeholder="Send a private message">
         <div class="input-group-append">
-          <button [disabled]="!messageForm.valid || loading" class="btn btn-primary" type="submit">Send
+          <button [disabled]="!messageForm.valid || loading || userBlocked || userHasBlocked" class="btn btn-primary" type="submit">Send
             <i *ngIf="loading" class="fa fa-spinner fa-spin"></i>
           </button>
         </div>

@@ -36,13 +36,13 @@ namespace API.Data
 
       if (likesParams.Predicate == "liked") {
           likes = likes.Where(like => like.SourceUserId == likesParams.UserId);
-          users = likes.Select(likes => likes.LikeUser);
+          users = likes.Select(like => like.LikeUser);
       }
 
       if (likesParams.Predicate == "likedBy") 
       {
           likes = likes.Where(like => like.LikeUserId == likesParams.UserId);
-          users = likes.Select(likes => likes.SourceUser);
+          users = likes.Select(like => like.SourceUser);
       }
 
       var likedUsers = users.Select(user => new LikeDto

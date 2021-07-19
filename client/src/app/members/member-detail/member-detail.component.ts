@@ -22,6 +22,8 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
   member: Member;
   isUserLiked: boolean;
   likeButton: string;
+  isUserBlocked: boolean;
+  blockButton: string;
   galleryOptions: NgxGalleryOptions[];
   galleryImages: NgxGalleryImage[];
   activeTab: TabDirective;
@@ -38,9 +40,10 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
     this.route.data.subscribe(data => {
       this.member = data.member;
     })
-    
+
     this.getLike();
-    
+    this.getBlockedUser();
+
     this.route.queryParams.subscribe(params => {
       params.tab ? this.selectTab(params.tab) : this.selectTab(0);
     })
@@ -83,6 +86,12 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       else {this.isUserLiked = true, this.likeButton = 'Unlike'};
     })
   }
+  getBlockedUser() {
+    this.memberService.getBlockedUser(this.member.username).subscribe(member => {
+      if (member == null){this.isUserBlocked = false, this.blockButton = 'Block'} 
+      else {this.isUserBlocked = true, this.blockButton = 'Unblock'};
+    })
+  }
 
   selectTab(tabId: number) {
     this.memberTabs.tabs[tabId].active = true;
@@ -117,4 +126,20 @@ export class MemberDetailComponent implements OnInit, OnDestroy {
       this.likeButton = "Like";
     } 
   }
+  blockUser(member: Member){
+   if(this.isUserBlocked == false){
+      this.memberService.block(member.username).subscribe(() => {
+        this.toastr.success('You have blocked ' + member.knownAs);
+       })
+       this.isUserBlocked = true;
+       this.blockButton = "Unblock";
+     }
+    else if(this.isUserBlocked == true) {
+       this.memberService.unblock(member.username).subscribe(() => {
+         this.toastr.success('You have unblocked ' + member.knownAs);
+       })
+       this.isUserBlocked = false;
+       this.blockButton = "Block";
+     } 
+   }
 }

@@ -16,6 +16,7 @@ namespace API.Data
     {
     }
     public DbSet<UserLike> Likes { get; set; }
+    public DbSet<BlockUser> Blocked {get; set; }
     public DbSet<Message> Messages { get; set; }
     public DbSet<Group> Groups {get; set;}
     public DbSet<Connection> Connections {get; set;}
@@ -49,6 +50,21 @@ namespace API.Data
           .HasOne(s => s.LikeUser)
           .WithMany(l => l.LikedByUsers)
           .HasForeignKey(s => s.LikeUserId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<BlockUser>()
+        .HasKey(k => new {k.SourceUserId, k.BlockedUserId});
+
+        builder.Entity<BlockUser>()
+          .HasOne(s => s.SourceUser)
+          .WithMany(l => l.BlockedUsers)
+          .HasForeignKey(s => s.SourceUserId)
+          .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<BlockUser>()
+          .HasOne(s => s.BlockedUser)
+          .WithMany(l => l.BlockedByUsers)
+          .HasForeignKey(s => s.BlockedUserId)
           .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<Message>()

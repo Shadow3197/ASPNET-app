@@ -29,7 +29,8 @@
           <button [ngClass]="{'btn-success' : !isUserLiked, 'btn-warning': isUserLiked}"
           (click)="addRemoveLike(member)">{{likeButton}}</button>
           <button (click)="selectTab(3)" class="btn-primary">Message</button>
-          <button class="btn-danger">Block</button>
+          <button [ngClass]="{'btn-danger' : !isUserBlocked, 'btn-secondary': isUserBlocked}"
+          (click)="blockUser(member)">{{blockButton}}</button>
         </div>
       </div>
     </div>
@@ -51,7 +52,7 @@
           style="display: inline-block; margin-bottom: 20px;"></ngx-gallery>
       </tab>
       <tab heading="Messages" (selectTab)="onTabActivated($event)">
-        <app-member-messages [username]="member.username"></app-member-messages>
+        <app-member-messages [username]="member.username" [userBlocked]="isUserBlocked"></app-member-messages>
       </tab>
     </tabset>
   </div>

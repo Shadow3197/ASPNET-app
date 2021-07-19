@@ -97,7 +97,6 @@ export class MembersService {
   }
 
   getLike(username: string) {
-    console.log('here');
     return this.http.get(this.baseUrl + 'likes/' + username);
   }
 
@@ -105,5 +104,24 @@ export class MembersService {
     let params = getPaginationHeaders(pageNumber, pageSize)
     params = params.append('predicate', predicate);
     return getPaginatedResult<Partial<Member[]>>(this.baseUrl + 'likes', params, this.http);
+  }
+
+  block(username: string) {
+    return this.http.post(this.baseUrl + 'Block/' + username, {})
+  }
+
+  unblock(username: string) {
+    return this.http.delete(this.baseUrl + 'Block/' + username);
+  }
+
+  getBlockedUser(username: string) {
+    return this.http.get(this.baseUrl + 'Block/' + username);
+  }
+
+  getUserHasBlocked(predicate: string, username: string) {
+    let paramuser = new HttpParams();
+    paramuser = paramuser.append('username', username);
+    paramuser = paramuser.append('predicate', predicate);
+    return getPaginatedResult(this.baseUrl + 'Block', paramuser, this.http);
   }
 }
