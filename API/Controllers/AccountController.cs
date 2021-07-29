@@ -10,6 +10,7 @@ using API.Interfaces;
 using System.Linq;
 using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using API.Extensions;
 
 namespace API.Controllers
 {
@@ -19,14 +20,15 @@ namespace API.Controllers
     private readonly IMapper _mapper;
     private readonly SignInManager<AppUser> _signInManager;
     private readonly UserManager<AppUser> _userManager;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IMapper mapper)
+    public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, ITokenService tokenService, IMapper mapper, IUnitOfWork unitOfWork)
     {
       _userManager = userManager;
       _signInManager = signInManager;
       _mapper = mapper;
       _tokenService = tokenService;
-      
+      _unitOfWork = unitOfWork;
     }
 
     [HttpPost("register")]
@@ -76,6 +78,21 @@ namespace API.Controllers
         KnownAs = user.KnownAs,
         Gender = user.Gender
       };
+    }
+
+    [HttpPost("changePassword")]
+    public async Task<ActionResult> updatePassword(NewPassDto newPassDto)
+    {
+      
+      var user = await _unitOfWork.UserRepository.GetUserByUsernameAsync(User.GetUsername());
+
+      var result = await _userManager.ChangePasswordAsync(user, newPassDto.CurrentPassword, newPassDto.NewPassword);
+      
+      if(!result.Succeeded) return Unauthorized("Current password was wrong");
+
+      if (result.Succeeded) return NoContent();
+
+      return BadRequest("Failed to update password");
     }
 
     private async Task<bool> UserExists(string username)

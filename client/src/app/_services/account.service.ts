@@ -57,4 +57,8 @@ export class AccountService {
     return JSON.parse(atob(token.split('.')[1]));
   }
 
+  updatePassword(model: any){
+     return this.http.post(this.baseUrl + 'account/changePassword', model)
+  }
+
 }
