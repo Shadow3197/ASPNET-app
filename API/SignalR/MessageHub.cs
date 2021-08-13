@@ -5,6 +5,7 @@ using API.DTOs;
 using API.Entities;
 using API.Extensions;
 using API.Interfaces;
+using API.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.SignalR;
 
@@ -33,8 +34,10 @@ namespace API.SignalR
       var group = await AddToGroup(groupName);
       await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
 
-      var messages = await _unitOfWork.MessageRepository.GetMessageThread(Context.User.GetUsername(), otherUser);
+      var count = await _unitOfWork.MessageRepository.GetUnreadMessageThread(Context.User.GetUsername(), otherUser);
+      await Clients.Caller.SendAsync("ReduceCount", count);
 
+      var messages = await _unitOfWork.MessageRepository.GetMessageThread(Context.User.GetUsername(), otherUser);
       if(_unitOfWork.HasChanges()) await _unitOfWork.Complete();
       
       await Clients.Caller.SendAsync("ReceiveMessageThread", messages);

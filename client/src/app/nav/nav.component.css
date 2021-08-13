@@ -3,7 +3,23 @@
 }
 
 img {
-  max-height: 50px;
+  max-height: 60px;
   border: 2px solid white;
   display: inline;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-block;
+  border-radius: 2px;
+}
+
+.nav-link .badge {
+  position: absolute;
+  top: 5px;
+  right: -5px;
+  padding: 5px 10px;
+  border-radius: 70%;
+  background: skyblue;
+  color: white;
 }

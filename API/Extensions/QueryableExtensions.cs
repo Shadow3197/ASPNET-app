@@ -10,7 +10,7 @@ namespace API.Extensions
         {
             var unreadMessages = query.Where(m => m.DateRead == null
                 && m.RecipientUsername == currentUsername);
- 
+
             if (unreadMessages.Any())
             {
                 foreach (var message in unreadMessages)

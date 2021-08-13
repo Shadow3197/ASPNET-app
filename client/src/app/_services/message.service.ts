@@ -9,6 +9,7 @@ import { Message } from '../models/message';
 import { User } from '../models/user';
 import { BusyService } from './busy.service';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
+import { PresenceService } from './presence.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class MessageService {
   messageThread$ = this.messageThreadSource.asObservable();
 
 
-  constructor(private http: HttpClient, private busyService: BusyService) { }
+  constructor(private http: HttpClient, private busyService: BusyService, public presence: PresenceService ) { }
 
   createHubConnection(user: User, otherUsername: string)
   {
@@ -36,6 +37,10 @@ export class MessageService {
       this.hubConnection.start()
         .catch(error => console.log(error))
         .finally(() => this.busyService.idle());
+
+      this.hubConnection.on('ReduceCount', count => {
+        this.presence.unreadMessageSource.next(this.presence.unreadMessageSource.value - count);
+      })
 
       this.hubConnection.on('ReceiveMessageThread', messages => {
         this.messageThreadSource.next(messages);
@@ -69,6 +74,11 @@ export class MessageService {
       this.messageThreadSource.next([]);
        this.hubConnection.stop();
     }
+  }
+
+  getUnreadMessageCount(username: string)
+  {
+    return this.http.get<Message[]>(this.baseUrl + 'message/' + username);
   }
 
   getMessages(pageNumber, pageSize, container)

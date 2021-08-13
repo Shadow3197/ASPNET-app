@@ -10,7 +10,10 @@
             <a class="nav-link" routerLink="/lists" routerLinkActive='active'>Events</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" routerLink="/messages" routerLinkActive='active'>Messages</a>
+            <a class="nav-link" routerLink="/messages" routerLinkActive='active'>
+              <span>Messages</span>
+              <span class="badge" >{{presence.unreadMessageSource.value}}</span>
+            </a>
           </li>
           <li *appHasRole='["Admin", "Moderator"]' class="nav-item">
             <a class="nav-link" routerLink="/admin" routerLinkActive='active'>Admin</a>
