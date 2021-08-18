@@ -39,7 +39,6 @@ namespace API.Data
           blockedUsers = blockedUsers.Where(blocked => blocked.BlockedUserId == blockParams.UserId);
           blockedUsers = blockedUsers.Where(blocked => blocked.SourceUser.UserName == blockParams.Username);
           users = blockedUsers.Select(blocked => blocked.SourceUser);
-          //users = users.AppUser.UserName == blockParams.Username;
       }
 
       var blockedUser = await users.Select(user => new BlockDto

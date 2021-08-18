@@ -92,5 +92,5 @@ namespace API.Controllers
       else {return Ok(userBlock);}
       
     }
-    }
+  }
 }
